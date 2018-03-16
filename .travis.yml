@@ -1,0 +1,24 @@
+dist: trusty
+sudo: required
+
+services:
+    - docker
+
+env:
+    global:
+        - DOCKER_DIR="$HOME/.cache/docker"
+
+cache:
+    directories:
+        - $DOCKER_DIR
+
+before_install:
+    - true
+
+install:
+    - true
+
+script:
+    - test -f "$DOCKER_DIR/image.tar" && docker load -i "$DOCKER_DIR/image.tar" || true
+    - docker build -t exchange:latest .
+    - docker save -o "$DOCKER_DIR/image.tar" $(docker history -q exchange:latest | grep -v '<missing>')
